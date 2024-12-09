@@ -2,6 +2,7 @@ import sys
 
 disk_map = {}
 empties = {}
+files = {}
 
 
 def read_disk_map(line):
@@ -16,6 +17,7 @@ def read_disk_map(line):
             free_space = False
             file_id += 1
         else:
+            files[file_id] = (digit, disk_pos)
             for i in range(digit):
                 disk_map[disk_pos + i] = file_id
             disk_pos += digit
@@ -35,6 +37,27 @@ def compact():
             end_of_list -= 1
 
 
+def compact_pt2():
+    list_files = reversed(list(files.keys()))
+
+    # For each file in list, can we move it to the left?
+    for file_id in list_files:
+        (file_size, start_pos) = files[file_id]
+        empty_list = sorted(list(empties.keys()))
+        for empty in empty_list:
+            if empties[empty] >= file_size:
+                if start_pos > empty:
+                    print("Moving file ", file_id, " to ", empty)
+                    for i in range(file_size):
+                        disk_map[empty + i] = file_id
+                        del disk_map[start_pos + i]
+                    files[file_id] = (file_size, empty)
+                    if (empties[empty] > file_size):
+                        empties[empty + file_size] = empties[empty] - file_size
+                    del empties[empty]
+                    break
+
+
 def calculate_check_sum():
     total = 0
     for key in disk_map:
@@ -49,13 +72,17 @@ def puzzle(filename):
     for line in lines:
         read_disk_map(line)
 
-    print(disk_map)
-    print(empties)
-    compact()
-    print("After compact:", disk_map)
-    total = calculate_check_sum()
+    # print(disk_map)
+    # print(empties)
+    # compact()
+    # print("After compact:", disk_map)
+    #total = calculate_check_sum()
 
-    print("Part 1", total)
+    # print("Part 1", total)
+    compact_pt2()
+    total_pt2 = calculate_check_sum()
+    # print("After compact:", disk_map)
+
     print("Part 2", total_pt2)
 
 
