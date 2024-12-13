@@ -28,6 +28,7 @@ class Machine:
 
 def puzzle(filename):
     machines = []
+    machines_pt2 = []
     total = 0
     total_pt2 = 0
     lines = open(filename, 'r').read().split('\n')
@@ -38,6 +39,10 @@ def puzzle(filename):
         prize_X, prize_Y = a_re.match(lines[i * 4 + 2]).groups()
         machines.append(
             Machine(btnA_X, btnA_Y, btnB_X, btnB_Y, prize_X, prize_Y))
+        machines_pt2.append(
+            Machine(btnA_X, btnA_Y, btnB_X, btnB_Y,
+                    int(prize_X) + 10000000000000,
+                    int(prize_Y) + 10000000000000))
 
     for machine in machines:
         machine_tokens = machine.solve()
@@ -45,6 +50,11 @@ def puzzle(filename):
         print(machine_tokens, total)
 
     print("Part 1", total)
+    for machine in machines_pt2:
+        machine_tokens = machine.solve()
+        total_pt2 += machine_tokens
+        print(machine_tokens, total_pt2)
+
     print("Part 2", total_pt2)
 
 
