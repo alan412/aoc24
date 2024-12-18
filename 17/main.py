@@ -21,6 +21,22 @@ def get_combo_operand(operand):
         return 0
 
 
+def solve_pt2(answer, startVal):
+    global register_a, register_b, register_c, program, output
+    print("Solving for", answer, startVal)
+    for test_val in range(64):
+        output = []
+        register_a = (startVal << 3) + test_val
+        ip = 0
+        while ip < len(program):
+            ip = execute_instruction(ip)
+        if output == answer:
+            return (startVal << 3) + test_val
+
+    print("!!!! SHOULD NEVER GET HERE!!!!")
+    return 0
+
+
 def execute_instruction(ip):
     global register_a, register_b, register_c, program, output
 
@@ -49,6 +65,23 @@ def execute_instruction(ip):
     return ip + 2
 
 
+mnemonics = {
+    0: 'adv',
+    1: 'bxl',
+    2: 'bst',
+    3: 'jnz',
+    4: 'bxc',
+    5: 'out',
+    6: 'bdv',
+    7: 'cdv'
+}
+
+
+def print_program():
+    for instruction, operand in zip(program[::2], program[1::2]):
+        print(mnemonics[instruction], operand)
+
+
 def puzzle(filename):
     total = 0
     total_pt2 = 0
@@ -67,23 +100,35 @@ def puzzle(filename):
         elif groups[0] == "Program":
             program = [int(x) for x in groups[1].split(',')]
 
-    print("Register A", register_a)
-    print("Register B", register_b)
-    print("Register C", register_c)
+#    print("Register A", register_a)
+#    print("Register B", register_b)
+#    print("Register C", register_c)
     print("Program", program)
+    #    print_program()
     ip = 0
     while ip < len(program):
         ip = execute_instruction(ip)
 
-    print("Register A", register_a)
-    print("Register B", register_b)
-    print("Register C", register_c)
+
+#    print("Register A", register_a)
+#    print("Register B", register_b)
+#    print("Register C", register_c)
 
     print("Output:", ",".join([str(x) for x in output]))
 
-    print("Part 1", total)
-    print("Part 2", total_pt2)
+    answer = []
+    startVal = 0
+    for bytecode in program[::-1]:
+        answer = [bytecode] + answer
+        startVal = solve_pt2(answer, startVal)
 
+    print("Register A", startVal)
+    ip = 0
+    register_a = startVal
+    output = []
+    while ip < len(program):
+        ip = execute_instruction(ip)
+    print("Output:", ",".join([str(x) for x in output]))
 
 if __name__ == "__main__":
     lists = puzzle(sys.argv[1])
