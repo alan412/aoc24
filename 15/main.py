@@ -1,11 +1,12 @@
 import sys
-from copy import deepcopy
 
 movements = []
 robot = (0, 0)
 
 already_moved = {}
 warehouse = {}
+
+need_to_move = []
 
 
 def can_move(pos, direction):
@@ -43,13 +44,15 @@ def can_move(pos, direction):
 
             if moving:
                 if (newX, newY) not in already_moved:
-                    warehouse[(newX, newY + (direction == 'v') -
-                               (direction == '^'))] = moveSpot
-                    warehouse[(
-                        newX + side_dir, newY + (direction == 'v') -
-                        (direction == '^'))] = '[' if moveSpot == ']' else ']'
-                    del warehouse[(newX, newY)]
-                    del warehouse[(newX + side_dir, newY)]
+                    need_to_move.append(
+                        (newX, newY + (direction == 'v') - (direction == '^'),
+                         moveSpot))
+                    need_to_move.append(
+                        (newX + side_dir,
+                         newY + (direction == 'v') - (direction == '^'),
+                         '[' if moveSpot == ']' else ']'))
+                    need_to_move.append((newX, newY, '.'))
+                    need_to_move.append((newX + side_dir, newY, '.'))
 
                     already_moved[(newX, newY)] = True
                     already_moved[(newX + side_dir, newY)] = True
@@ -109,13 +112,16 @@ def puzzle(filename):
         if can_move(robot, movement):
             robot = (robot[0] + (movement == '>') - (movement == '<'),
                      robot[1] + (movement == 'v') - (movement == '^'))
-        # print_warehouse(warehouse)
+            for move in need_to_move:
+                warehouse[move[0], move[1]] = move[2]
+        print_warehouse(warehouse)
 
     print_warehouse(warehouse)
     for location in warehouse:
         if warehouse[location] == '[':
             score = location[1] * 100 + location[0]
             total_pt2 += score
+            print(score, location, total_pt2)
 
     print("Part 1", total)
     print("Part 2", total_pt2)
