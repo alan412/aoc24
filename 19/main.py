@@ -1,5 +1,36 @@
 import sys
 import re
+from functools import lru_cache
+
+dict_towels = {}
+
+
+@lru_cache(maxsize=None)
+def get_num_possibilities(pattern):
+    global dict_towels
+    if pattern == "":
+        return 1
+    if pattern[0] not in dict_towels:
+        return 0
+    possible_towels = dict_towels[pattern[0]]
+    total = 0
+    for towel in possible_towels:
+        if pattern[:len(towel)] == towel:
+            total += get_num_possibilities(pattern[len(towel):])
+    return total
+
+
+# Store towel in a huge hash map
+# list should have letters that can be all or partially consumed
+def store_towel(towel):
+    global dict_towels
+
+    partial_towel = ""
+    for ch in towel:
+        partial_towel += ch
+        if partial_towel not in dict_towels:
+            dict_towels[partial_towel] = []
+        dict_towels[partial_towel].append(towel)
 
 
 def puzzle(filename):
@@ -19,18 +50,16 @@ def puzzle(filename):
     print(towels)
     print(desired_patterns)
 
-    reg_ex_expression = "^("
     for towel in towels:
-        reg_ex_expression += "(" + towel + ")|"
-    reg_ex_expression = reg_ex_expression[:-1]
-    reg_ex_expression += ")+$"
+        store_towel(towel)
+    print(dict_towels)
 
     for pattern in desired_patterns:
-        match = re.match(reg_ex_expression, pattern)
-        print(match, pattern)
-        if match != None:
+        num = get_num_possibilities(pattern)
+        print(num, pattern)
+        if num > 0:
             total += 1
-
+        total_pt2 += num
     print("Part 1", total)
     print("Part 2", total_pt2)
 
