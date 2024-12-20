@@ -31,6 +31,12 @@ def print_maze(maze):
         print(row)
 
 
+def find_cheats2(path, maze):
+    cheats = [(abs(x1 - x) + abs(y1 - y), m) for n, (x, y) in enumerate(path)
+              for m, (x1, y1) in enumerate(path[n + 102:])]
+    return cheats
+
+
 def find_cheats(path, maze):
     cheats = {}
     # Look for positions that could be 2 apart but have a wall in the middle
@@ -79,11 +85,15 @@ def puzzle(filename):
     print("Start:", start, " End:", end)
     print_maze(maze)
     path = solve(start, end, maze)
-    cheats = find_cheats(path, maze)
-    for cheat in dict(sorted(cheats.items())):
-        print("Cheat", cheat, len(cheats[cheat]))
-        if cheat >= 100:
-            total += len(cheats[cheat])
+    #cheats = find_cheats(path, maze)
+    #for cheat in dict(sorted(cheats.items())):
+    #    print("Cheat", cheat, len(cheats[cheat]))
+    #    if cheat >= 100:
+    #        total += len(cheats[cheat])
+    cheats = find_cheats2(path, maze)
+    total = sum(d == 2 for d, _ in cheats)
+    total_pt2 = sum(d <= min(20, m + 2) for d, m in cheats)
+
     print("Part 1", total)
     print("Part 2", total_pt2)
 
