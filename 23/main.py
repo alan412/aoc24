@@ -13,6 +13,28 @@ def find_triplets(computer):
                 triplets.add(tuple(sorted([computer, c1, c2])))
 
 
+explored = set()
+max_lan_size = -1
+
+
+def find_connected(computer, visited, index):
+    global max_lan_size
+    node_list = connections[computer]
+    for i in range(index, len(node_list)):
+        node = node_list[i]
+        if node in explored:
+            continue
+        if not all(node in connections[n] for n in visited):
+            continue
+        visited.append(node)
+        find_connected(computer, visited, i + 1)
+        if len(visited) > max_lan_size:
+            max_lan_size = len(visited)
+            print("New max lan size", max_lan_size,
+                  {','.join(x for x in sorted(visited))})
+        visited.remove(node)
+
+
 def puzzle(filename):
     total = 0
     total_pt2 = 0
@@ -39,7 +61,9 @@ def puzzle(filename):
             total += 1
 
     print("Part 1", total)
-    print("Part 2", total_pt2)
+    for computer in connections:
+        find_connected(computer, [computer], 0)
+        explored.add(computer)
 
 
 if __name__ == "__main__":
