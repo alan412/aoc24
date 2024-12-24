@@ -53,6 +53,41 @@ def part1(gates, operations):
     return result
 
 
+def print_tree(operations_dict, key, indent="", printed=[]):
+    if key in operations_dict:
+        if key in printed:
+            return
+        printed.append(key)
+        print(indent, key, operations_dict[key])
+        (gate1, op, gate2) = operations_dict[key]
+        print_tree(operations_dict, gate1, indent + "1=")
+        print_tree(operations_dict, gate2, indent + "2=")
+
+
+def fix(operations):
+    operations['hnd'], operations['z09'] = operations['z09'], operations['hnd']
+    operations['z16'], operations['tdv'] = operations['tdv'], operations['z16']
+    operations['bks'], operations['z23'] = operations['z23'], operations['bks']
+    operations['tjp'], operations['nrn'] = operations['nrn'], operations['tjp']
+
+    tmp_list = ['hnd', 'z09', 'tdv', 'z16', 'bks', 'z23', 'tjp', 'nrn']
+    print(",".join(sorted(tmp_list)))
+
+
+def part2(gates, operations):
+    operations_dict = {}
+    for operation in operations:
+        (gate1, op, gate2, output_gate) = operation
+        operations_dict[output_gate] = (gate1, op, gate2)
+
+    fix(operations_dict)
+
+    for key in sorted(operations_dict.keys()):
+        if key.startswith('z'):
+            #print_tree(operations_dict, key)
+            pass
+
+
 def puzzle(filename):
     total = 0
     total_pt2 = 0
@@ -81,6 +116,8 @@ def puzzle(filename):
 
     result = part1(gates, operations)
     total = int(result, 2)
+
+    part2(gates, operations)
 
     print("Part 1", total, result)
     print("Part 2", total_pt2)
