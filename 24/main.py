@@ -26,6 +26,33 @@ class Gate():
         return f"{self.name} = {self.value}"
 
 
+def part1(gates, operations):
+    done = False
+    while not done:
+        for operation in operations:
+            (gate1, op, gate2, output_gate) = operation
+            if op == "AND":
+                gates[output_gate].value = gates[gate1].andGate(gates[gate2])
+            elif op == "OR":
+                gates[output_gate].value = gates[gate1].orGate(gates[gate2])
+            elif op == "XOR":
+                gates[output_gate].value = gates[gate1].xorGate(gates[gate2])
+            else:
+                print("Unknown operation", op)
+        bit = 0
+        found_none = False
+        result = ""
+        while f"z{bit:02}" in gates:
+            if gates[f"z{bit:02}"].value == None:
+                found_none = True
+                break
+            result = str(gates[f"z{bit:02}"].value) + result
+            bit += 1
+        if not found_none:
+            done = True
+    return result
+
+
 def puzzle(filename):
     total = 0
     total_pt2 = 0
@@ -52,32 +79,9 @@ def puzzle(filename):
             if output_gate not in gates:
                 gates[output_gate] = Gate(output_gate)
 
-    done = False
-    while not done:
-        for operation in operations:
-            (gate1, op, gate2, output_gate) = operation
-            if op == "AND":
-                gates[output_gate].value = gates[gate1].andGate(gates[gate2])
-            elif op == "OR":
-                gates[output_gate].value = gates[gate1].orGate(gates[gate2])
-            elif op == "XOR":
-                gates[output_gate].value = gates[gate1].xorGate(gates[gate2])
-            else:
-                print("Unknown operation", op)
-        print(gates)
-        bit = 0
-        found_none = False
-        result = ""
-        while f"z{bit:02}" in gates:
-            if gates[f"z{bit:02}"].value == None:
-                found_none = True
-                break
-            result = str(gates[f"z{bit:02}"].value) + result
-            bit += 1
-        if not found_none:
-            done = True
-    print(result)
+    result = part1(gates, operations)
     total = int(result, 2)
+
     print("Part 1", total, result)
     print("Part 2", total_pt2)
 
